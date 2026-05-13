@@ -3,1036 +3,1147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cartas de Riesgo — SST Alturas</title>
+<title>SST Alturas — Cartas & Investigación AT</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold: #ffd54f;
-  --gold-dark: #f9a825;
-  --bg: #0b141a;
-  --bg2: #111e26;
-  --bg3: #18292f;
-  --border: #1e3a44;
-  --blue: #1565c0;
-  --blue-light: #42a5f5;
-  --red: #b71c1c;
-  --red-light: #ef5350;
-  --green: #1b5e20;
-  --green-light: #66bb6a;
-  --text: #e8f4f8;
-  --text-dim: #7fa8b8;
+:root{
+  --gold:#ffd54f; --gold-dark:#f9a825;
+  --bg:#0b141a; --bg2:#111e26; --bg3:#18292f; --border:#1e3a44;
+  --text:#e8f4f8; --text-dim:#7fa8b8;
+  --green:#66bb6a; --red:#ef5350; --blue:#42a5f5; --orange:#ffa726;
 }
+*{margin:0;padding:0;box-sizing:border-box;}
 
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  font-family: 'Nunito', sans-serif;
-  background: var(--bg);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 16px 40px;
-  color: var(--text);
-  overflow-x: hidden;
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg); min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+  padding:20px 14px 50px; color:var(--text); overflow-x:hidden;
 }
-
-body::before {
-  content:'';
-  position:fixed;
-  inset:0;
+body::before{
+  content:''; position:fixed; inset:0;
   background-image:
-    linear-gradient(rgba(255,213,79,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,213,79,.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events:none;
-  z-index:0;
+    linear-gradient(rgba(255,213,79,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,213,79,.025) 1px,transparent 1px);
+  background-size:40px 40px; pointer-events:none; z-index:0;
 }
 
-/* ── HEADER ── */
-.header {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  margin-bottom: 28px;
+/* ── SOUND BTN ── */
+.sound-btn{
+  position:fixed; top:14px; right:14px; z-index:600;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:50%; width:42px; height:42px; font-size:1.2rem;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,.5); transition:transform .2s;
+}
+.sound-btn:hover{transform:scale(1.1);}
+
+/* ── SCREEN WRAPPER ── */
+.screen{display:none; flex-direction:column; align-items:center; width:100%; position:relative; z-index:1;}
+.screen.active{display:flex;}
+
+/* ════════════════════════════
+   PHASE 1 — CARDS
+   ════════════════════════════ */
+.header{text-align:center; margin-bottom:20px;}
+.header h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.2rem,6vw,3.6rem);
+  letter-spacing:4px; color:var(--gold);
+  text-shadow:0 0 28px rgba(255,213,79,.35); line-height:1;
+}
+.header .sub{
+  margin-top:5px; font-size:.82rem;
+  color:var(--text-dim); letter-spacing:2px; text-transform:uppercase;
+}
+.panel{
+  display:flex; gap:10px; flex-wrap:wrap;
+  justify-content:center; margin-bottom:18px;
+}
+.box{
+  background:var(--bg3); padding:8px 18px;
+  border-radius:50px; border:1px solid var(--border);
+  font-weight:700; font-size:.9rem;
+  display:flex; align-items:center; gap:7px;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);
+}
+.box .val{font-size:1.2rem; color:var(--gold); min-width:20px; text-align:center;}
+.box .val.bump{animation:bump .35s ease;}
+@keyframes bump{0%{transform:scale(1)}50%{transform:scale(1.6)}100%{transform:scale(1)}}
+
+.progress-wrap{width:100%; max-width:520px; margin-bottom:18px;}
+.progress-label{display:flex; justify-content:space-between; font-size:.78rem; color:var(--text-dim); margin-bottom:5px;}
+.progress-bar{height:7px; background:var(--bg3); border-radius:99px; border:1px solid var(--border); overflow:hidden;}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--gold-dark),var(--gold)); border-radius:99px; transition:width .5s ease; box-shadow:0 0 8px rgba(255,213,79,.35);}
+
+/* GRID */
+.grid{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:12px; width:100%; max-width:840px;
+}
+.card{
+  aspect-ratio:3/4; cursor:pointer; border-radius:16px;
+  background:linear-gradient(160deg,#1a2f3a,#0f1e24);
+  border:2px solid var(--gold);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:7px; padding:10px;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);
+  transition:transform .2s, box-shadow .2s, opacity .4s;
+  user-select:none; position:relative;
+}
+.card:not(.used):hover{transform:translateY(-4px) scale(1.03); box-shadow:0 0 0 2px var(--gold),0 14px 32px rgba(255,213,79,.22);}
+.card.used{opacity:.32; cursor:default; pointer-events:none; border-color:#2e4b57;}
+.card .icon{font-size:2.2rem; line-height:1;}
+.card h2{font-size:.76rem; font-weight:800; color:var(--gold); text-align:center; line-height:1.2;}
+.card .tap-hint{font-size:.6rem; color:var(--text-dim); text-align:center;}
+.card.type-question{border-color:#2979ff;} .card.type-question h2{color:#90caf9;}
+.card.type-risk{border-color:#ff5252;}     .card.type-risk h2{color:#ef9a9a;}
+.card.type-protect{border-color:#69f0ae;}  .card.type-protect h2{color:#a5d6a7;}
+.card.type-black{border-color:#555;}       .card.type-black h2{color:#bbb;}
+
+.type-badge{
+  position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  font-size:.55rem; font-weight:800; padding:2px 8px;
+  border-radius:99px; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap;
+}
+.badge-question{background:#1a3a6e; color:#90caf9; border:1px solid #2979ff;}
+.badge-risk    {background:#6e1a1a; color:#ef9a9a; border:1px solid #ff5252;}
+.badge-protect {background:#1a4e20; color:#a5d6a7; border:1px solid #69f0ae;}
+.badge-black   {background:#222;    color:#bbb;    border:1px solid #555;}
+
+.result{
+  margin-top:18px; background:var(--bg3); padding:12px 18px;
+  border-radius:12px; text-align:center; font-size:.92rem; font-weight:600;
+  max-width:680px; width:100%; border:1px solid var(--border);
+  min-height:50px; display:flex; align-items:center; justify-content:center;
+  line-height:1.5;
+}
+.restart-btn{
+  margin-top:16px; background:var(--gold); color:#111;
+  padding:11px 24px; font-size:.95rem; border-radius:50px;
+  font-weight:800; cursor:pointer; border:none;
+  transition:transform .2s, box-shadow .2s;
+  font-family:'Nunito',sans-serif;
+  box-shadow:0 4px 18px rgba(255,213,79,.3);
+}
+.restart-btn:hover{transform:translateY(-2px); box-shadow:0 8px 26px rgba(255,213,79,.42);}
+
+/* ════════════════════════════
+   MODAL (shared)
+   ════════════════════════════ */
+.modal-backdrop{
+  display:none; position:fixed; inset:0; z-index:300;
+  background:rgba(0,0,0,.8); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; padding:16px;
+}
+.modal-backdrop.open{display:flex;}
+.modal{
+  width:100%; max-width:460px; border-radius:26px;
+  padding:26px 22px 20px; display:flex; flex-direction:column; gap:16px;
+  box-shadow:0 20px 70px rgba(0,0,0,.9);
+  animation:popIn .32s cubic-bezier(.34,1.56,.64,1);
+  position:relative; max-height:90vh; overflow-y:auto;
+}
+@keyframes popIn{from{transform:scale(.82);opacity:0}to{transform:scale(1);opacity:1}}
+.modal.question{background:linear-gradient(160deg,#1a3a6e,#0d2244);border:2px solid #2979ff;}
+.modal.risk    {background:linear-gradient(160deg,#6e1a1a,#3e0c0c);border:2px solid #ff5252;}
+.modal.protect {background:linear-gradient(160deg,#1a4e20,#0c2e10);border:2px solid #69f0ae;}
+.modal.black   {background:linear-gradient(160deg,#222,#0a0a0a);   border:2px solid #555;}
+
+.modal-close{
+  position:absolute; top:14px; right:14px;
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+  color:white; border-radius:50%; width:32px; height:32px;
+  font-size:.9rem; cursor:pointer; display:flex;
+  align-items:center; justify-content:center; transition:.2s;
+}
+.modal-close:hover{background:rgba(255,255,255,.22);}
+.modal-header{display:flex; align-items:center; gap:12px; padding-right:36px;}
+.modal-icon{font-size:2.8rem; line-height:1;}
+.modal-title{font-family:'Bebas Neue',sans-serif; font-size:1.75rem; letter-spacing:2px;}
+.modal-question{font-size:1rem; font-weight:700; line-height:1.5; color:var(--text);}
+.modal-btns{display:flex; flex-direction:column; gap:9px;}
+.opt-btn{
+  padding:12px 14px; border:none; border-radius:12px;
+  font-weight:700; font-size:.9rem; cursor:pointer;
+  transition:transform .15s, background .2s;
+  font-family:'Nunito',sans-serif;
+  background:rgba(255,255,255,.1); color:white;
+  border:1px solid rgba(255,255,255,.18); text-align:left;
+}
+.opt-btn:hover:not(:disabled){transform:scale(1.02); background:rgba(255,255,255,.2);}
+.opt-btn:disabled{cursor:default; transform:none;}
+.opt-btn.correct{background:#1b5e20!important; border-color:#69f0ae!important;}
+.opt-btn.wrong  {background:#7f0000!important; border-color:#ff5252!important;}
+.modal-text{font-size:.96rem; line-height:1.6; opacity:.92; text-align:center;}
+.action-btn{
+  padding:12px 22px; border:none; border-radius:12px;
+  font-weight:800; font-size:.95rem; cursor:pointer;
+  font-family:'Nunito',sans-serif; transition:transform .15s; width:100%;
+}
+.action-btn:hover{transform:scale(1.03);}
+.action-btn.green{background:var(--green); color:#0c2e10;}
+.action-btn.gray {background:#888; color:#111;}
+.modal-feedback{
+  font-size:.9rem; font-weight:700; text-align:center;
+  padding:9px 12px; border-radius:10px; display:none; line-height:1.4;
+}
+.modal-feedback.success{display:block; background:rgba(27,94,32,.6); color:#a5d6a7; border:1px solid #69f0ae;}
+.modal-feedback.danger {display:block; background:rgba(127,0,0,.6);  color:#ef9a9a; border:1px solid #ff5252;}
+.modal-feedback.info   {display:block; background:rgba(21,101,192,.4);color:#90caf9; border:1px solid #2979ff;}
+.modal-continue{
+  padding:11px; border:none; border-radius:12px;
+  font-weight:800; font-size:.9rem; cursor:pointer;
+  font-family:'Nunito',sans-serif;
+  background:rgba(255,255,255,.1); color:white;
+  border:1px solid rgba(255,255,255,.2); display:none; width:100%;
+  transition:background .2s;
+}
+.modal-continue.visible{display:block;}
+.modal-continue:hover{background:rgba(255,255,255,.2);}
+
+/* ════════════════════════════
+   OVERLAYS
+   ════════════════════════════ */
+.overlay{
+  display:none; position:fixed; inset:0; z-index:400;
+  background:rgba(0,0,0,.88); align-items:center; justify-content:center;
+  flex-direction:column; text-align:center; padding:22px; backdrop-filter:blur(5px);
+}
+.overlay.show{display:flex;}
+.overlay-box{
+  background:var(--bg2); border-radius:24px; padding:32px 32px 26px;
+  border:2px solid var(--border); max-width:400px; width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.8);
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.overlay-box h2{font-family:'Bebas Neue',sans-serif; font-size:2.8rem; letter-spacing:3px; margin-bottom:8px;}
+.overlay-box p{color:var(--text-dim); margin-bottom:16px; font-size:.92rem; line-height:1.5;}
+.overlay-box .score-big{font-size:2.4rem; font-weight:800; color:var(--gold); margin-bottom:18px;}
+.overlay-box .next-btn{
+  background:var(--blue); color:white; border:none;
+  padding:13px 24px; font-size:1rem; border-radius:50px;
+  font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif;
+  transition:transform .2s; box-shadow:0 4px 18px rgba(66,165,245,.3);
+}
+.overlay-box .next-btn:hover{transform:translateY(-2px);}
+
+/* ════════════════════════════
+   PHASE 2 — INVESTIGATION
+   ════════════════════════════ */
+#screen-investigation{
+  max-width:680px; width:100%; gap:0;
 }
 
-.header h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2.6rem, 7vw, 4rem);
-  letter-spacing: 4px;
-  color: var(--gold);
-  text-shadow: 0 0 30px rgba(255,213,79,.35);
-  line-height: 1;
+/* INTRO CINEMATIC */
+.inv-intro{
+  text-align:center; padding:10px 0 24px;
+}
+.inv-intro .badge{
+  display:inline-block; background:#7f0000;
+  border:1px solid #ff5252; color:#ef9a9a;
+  font-size:.75rem; font-weight:800; letter-spacing:2px;
+  padding:4px 14px; border-radius:99px; margin-bottom:14px;
+  text-transform:uppercase;
+}
+.inv-intro h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2rem,6vw,3.2rem);
+  letter-spacing:3px; color:var(--red); line-height:1;
+  text-shadow:0 0 24px rgba(239,83,80,.4);
+}
+.inv-intro .subtitle{
+  font-size:.88rem; color:var(--text-dim);
+  margin-top:6px; letter-spacing:1px;
 }
 
-.header .sub {
-  margin-top: 6px;
-  font-size: .9rem;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+/* SCORE CARRY */
+.score-carry{
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:14px; padding:10px 18px; margin-bottom:18px;
+  font-size:.85rem; color:var(--text-dim); font-weight:700;
+  display:flex; align-items:center; gap:8px; justify-content:center;
+}
+.score-carry span{color:var(--gold); font-size:1rem;}
+
+/* SCENE CARD */
+.scene-card{
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:20px; width:100%; padding:22px 20px;
+  margin-bottom:16px; box-shadow:0 8px 28px rgba(0,0,0,.5);
+  animation:slideUp .4s ease;
+}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.scene-tag{
+  font-size:.68rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:2px; margin-bottom:10px; display:flex; align-items:center; gap:6px;
+}
+.scene-tag.evidence{color:#ffa726;}
+.scene-tag.witness {color:#42a5f5;}
+.scene-tag.decision{color:#ce93d8;}
+.scene-tag.analysis{color:#80deea;}
+
+.scene-title{
+  font-family:'Bebas Neue',sans-serif; font-size:1.55rem;
+  letter-spacing:2px; margin-bottom:8px; line-height:1.1;
+}
+.scene-narr{
+  font-size:.9rem; line-height:1.65; color:var(--text-dim);
+  margin-bottom:16px;
 }
 
-/* ── PANEL ── */
-.panel {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 28px;
-  position: relative;
-  z-index: 1;
+/* EVIDENCE ITEMS */
+.evidence-list{
+  display:flex; flex-direction:column; gap:8px; margin-bottom:14px;
 }
-
-.box {
-  background: var(--bg3);
-  padding: 10px 22px;
-  border-radius: 50px;
-  border: 1px solid var(--border);
-  font-weight: 700;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.4);
-  transition: transform .2s;
+.ev-item{
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:12px; padding:10px 14px;
+  display:flex; align-items:center; gap:10px;
+  font-size:.85rem; font-weight:600; cursor:pointer;
+  transition:background .2s, border-color .2s;
 }
+.ev-item:hover{background:rgba(255,166,38,.08); border-color:var(--orange);}
+.ev-item.collected{background:rgba(255,166,38,.12); border-color:var(--orange); color:var(--orange);}
+.ev-item .ev-icon{font-size:1.4rem; flex-shrink:0;}
+.ev-item .ev-label{flex:1;}
+.ev-item .ev-check{font-size:1rem; opacity:0; transition:opacity .2s;}
+.ev-item.collected .ev-check{opacity:1;}
 
-.box .val {
-  font-size: 1.3rem;
-  color: var(--gold);
-  min-width: 24px;
-  text-align: center;
-  transition: transform .3s;
+/* SCENE CHOICES */
+.choices{display:flex; flex-direction:column; gap:9px;}
+.choice-btn{
+  padding:13px 16px; border:none; border-radius:14px;
+  font-weight:700; font-size:.88rem; cursor:pointer;
+  transition:transform .15s, background .2s;
+  font-family:'Nunito',sans-serif;
+  background:rgba(255,255,255,.08); color:white;
+  border:1px solid rgba(255,255,255,.15); text-align:left;
+  display:flex; align-items:flex-start; gap:10px; line-height:1.4;
 }
+.choice-btn:hover:not(:disabled){transform:scale(1.02); background:rgba(255,255,255,.16);}
+.choice-btn:disabled{cursor:default; transform:none; opacity:.7;}
+.choice-btn.ch-correct{background:rgba(27,94,32,.5)!important; border-color:#69f0ae!important;}
+.choice-btn.ch-wrong  {background:rgba(127,0,0,.5)!important;  border-color:#ff5252!important;}
+.choice-btn .ch-icon{font-size:1.2rem; flex-shrink:0; margin-top:1px;}
 
-.box .val.bump { animation: bump .35s ease; }
-
-@keyframes bump {
-  0%  { transform: scale(1); }
-  50% { transform: scale(1.5); }
-  100%{ transform: scale(1); }
+/* SCENE FEEDBACK */
+.scene-feedback{
+  margin-top:12px; padding:12px 16px; border-radius:12px;
+  font-size:.87rem; font-weight:700; line-height:1.5; display:none;
 }
+.scene-feedback.ok {display:block; background:rgba(27,94,32,.4); border:1px solid #69f0ae; color:#a5d6a7;}
+.scene-feedback.bad{display:block; background:rgba(127,0,0,.4);  border:1px solid #ff5252; color:#ef9a9a;}
+.scene-feedback.neutral{display:block; background:rgba(21,101,192,.3); border:1px solid #42a5f5; color:#90caf9;}
 
-/* ── PROGRESS ── */
-.progress-wrap {
-  width: 100%;
-  max-width: 560px;
-  margin-bottom: 24px;
-  position: relative;
-  z-index: 1;
+.scene-next-btn{
+  margin-top:14px; padding:12px 22px; border:none; border-radius:14px;
+  font-weight:800; font-size:.92rem; cursor:pointer;
+  font-family:'Nunito',sans-serif;
+  background:var(--gold); color:#111; width:100%;
+  display:none; transition:transform .2s;
 }
+.scene-next-btn.visible{display:block;}
+.scene-next-btn:hover{transform:scale(1.02);}
 
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: .8rem;
-  color: var(--text-dim);
-  margin-bottom: 6px;
+/* CAUSE TREE */
+.cause-tree{
+  background:rgba(0,0,0,.3); border:1px solid var(--border);
+  border-radius:14px; padding:14px 16px; margin-bottom:14px;
 }
-
-.progress-bar {
-  height: 8px;
-  background: var(--bg3);
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  overflow: hidden;
+.cause-tree h4{
+  font-size:.78rem; font-weight:800; letter-spacing:2px;
+  text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;
 }
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-  border-radius: 99px;
-  transition: width .5s ease;
-  box-shadow: 0 0 10px rgba(255,213,79,.4);
+.cause-row{
+  display:flex; align-items:center; gap:8px;
+  font-size:.82rem; padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
 }
-
-/* ── GRID ── */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  width: 100%;
-  max-width: 860px;
-  position: relative;
-  z-index: 1;
+.cause-row:last-child{border:none;}
+.cause-row .c-dot{
+  width:10px; height:10px; border-radius:50%; flex-shrink:0;
 }
+.cause-row .c-dot.basic{background:#ef5350;}
+.cause-row .c-dot.direct{background:#ffa726;}
+.cause-row .c-dot.root{background:#42a5f5;}
 
-/* ── CARD (front only, tap opens modal) ── */
-.card {
-  height: 150px;
-  cursor: pointer;
-  border-radius: 18px;
-  background: linear-gradient(160deg, #1a2f3a, #0f1e24);
-  border: 2px solid var(--gold);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 14px;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,.5);
-  transition: box-shadow .25s, transform .18s, opacity .3s;
-  position: relative;
-  overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
+/* INV STATS */
+.inv-stats{
+  display:flex; gap:10px; flex-wrap:wrap;
+  justify-content:center; margin-bottom:18px; width:100%;
 }
-
-.card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(255,213,79,.08) 0%, transparent 70%);
-  pointer-events: none;
+.inv-stat{
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:50px; padding:7px 16px;
+  font-weight:700; font-size:.85rem;
+  display:flex; align-items:center; gap:6px;
 }
+.inv-stat .sv{color:var(--gold);}
 
-.card:not(.used):hover, .card:not(.used):active {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 0 0 2px var(--gold), 0 14px 36px rgba(255,213,79,.22);
+/* FINAL REPORT */
+.final-report{
+  background:var(--bg2); border:2px solid var(--gold);
+  border-radius:22px; padding:24px 20px; width:100%;
+  text-align:center; animation:popIn .5s ease;
 }
-
-.card.used {
-  cursor: default;
-  opacity: .38;
-  pointer-events: none;
-  border-color: #2a4a54;
+.final-report h2{
+  font-family:'Bebas Neue',sans-serif; font-size:2.4rem;
+  letter-spacing:3px; color:var(--gold); margin-bottom:6px;
 }
-
-.card .icon { font-size: 2.4rem; line-height: 1; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
-.card h2 { font-size: .95rem; font-weight: 800; color: var(--gold); letter-spacing: .5px; }
-.card .tap-hint { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
-
-/* type badge */
-.card .type-badge {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  font-size: .58rem;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: 99px;
-  opacity: .85;
+.final-report .report-score{
+  font-size:3rem; font-weight:800; color:var(--gold); margin:10px 0;
 }
-.badge-question { background: rgba(41,121,255,.35); color: #90caf9; border: 1px solid #2979ff55; }
-.badge-risk     { background: rgba(255,82,82,.3);   color: #ff8a80; border: 1px solid #ff525255; }
-.badge-protect  { background: rgba(105,240,174,.2); color: #69f0ae; border: 1px solid #69f0ae55; }
-.badge-black    { background: rgba(200,200,200,.1); color: #aaa;    border: 1px solid #55555555; }
-
-/* ── MODAL ── */
-.modal-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.82);
-  z-index: 300;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+.final-report .report-rank{
+  display:inline-block; padding:6px 20px; border-radius:50px;
+  font-weight:800; font-size:.95rem; margin-bottom:16px;
 }
+.rank-expert   {background:#1b5e20; color:#a5d6a7; border:1px solid #69f0ae;}
+.rank-advanced {background:#1a3a6e; color:#90caf9; border:1px solid #2979ff;}
+.rank-basic    {background:#6e3a00; color:#ffcc80; border:1px solid #ffa726;}
+.rank-rookie   {background:#4a0000; color:#ef9a9a; border:1px solid #ff5252;}
 
-.modal-backdrop.open { display: flex; }
-
-.modal {
-  width: 100%;
-  max-width: 420px;
-  border-radius: 24px;
-  padding: 28px 24px 24px;
-  position: relative;
-  box-shadow: 0 24px 80px rgba(0,0,0,.8);
-  animation: modalIn .32s cubic-bezier(.34,1.56,.64,1);
-  max-height: 92vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+.report-causes{
+  text-align:left; margin:16px 0;
+  background:rgba(0,0,0,.3); border-radius:14px;
+  padding:14px 16px; border:1px solid var(--border);
 }
-
-@keyframes modalIn {
-  from { opacity:0; transform: scale(.88) translateY(24px); }
-  to   { opacity:1; transform: scale(1) translateY(0); }
+.report-causes h4{
+  font-size:.75rem; font-weight:800; letter-spacing:2px;
+  text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;
 }
-
-.modal.question { background: linear-gradient(160deg, #1a3a6e, #0d2244); border: 2px solid #2979ff; }
-.modal.risk     { background: linear-gradient(160deg, #6e1a1a, #3e0c0c); border: 2px solid #ff5252; }
-.modal.protect  { background: linear-gradient(160deg, #1a4e20, #0c2e10); border: 2px solid #69f0ae; }
-.modal.black    { background: linear-gradient(160deg, #222, #0a0a0a);   border: 2px solid #555; }
-
-.modal-close {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  background: rgba(255,255,255,.1);
-  border: 1px solid rgba(255,255,255,.15);
-  color: var(--text-dim);
-  font-size: 1rem;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .2s, color .2s;
-  line-height: 1;
-  font-weight: 700;
+.report-line{
+  display:flex; align-items:center; gap:8px;
+  font-size:.82rem; padding:4px 0;
 }
-.modal-close:hover { background: rgba(255,255,255,.2); color: white; }
+.report-line .dot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+.dot-found{background:#69f0ae;} .dot-missed{background:#ef5350;}
 
-.modal-icon { font-size: 2.8rem; text-align: center; margin-bottom: 8px; filter: drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
-.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; letter-spacing: 2px; color: var(--gold); text-align: center; margin-bottom: 16px; }
-
-.modal-question {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.5;
-  text-align: center;
-  margin-bottom: 18px;
-  color: var(--text);
-  padding: 0 4px;
+/* TOAST */
+.toast{
+  position:fixed; bottom:26px; left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:#1e3a26; border:1px solid var(--green);
+  color:var(--green); padding:10px 20px;
+  border-radius:50px; font-weight:700; font-size:.88rem;
+  z-index:700; transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s;
+  opacity:0; pointer-events:none; white-space:nowrap;
 }
+.toast.error{background:#3e0c0c; border-color:var(--red); color:var(--red);}
+.toast.info {background:#0d2244; border-color:var(--blue); color:var(--blue);}
+.toast.visible{transform:translateX(-50%) translateY(0); opacity:1;}
 
-.modal-btns {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.opt-btn {
-  padding: 13px 16px;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: .92rem;
-  cursor: pointer;
-  transition: transform .15s, background .2s, border-color .2s;
-  font-family: 'Nunito', sans-serif;
-  background: rgba(255,255,255,.1);
-  color: white;
-  text-align: left;
-  line-height: 1.4;
-}
-
-.opt-btn:hover:not(:disabled) { transform: scale(1.02); background: rgba(255,255,255,.2); }
-.opt-btn:disabled { cursor: default; transform: none; }
-.opt-btn.correct  { background: #1b5e20 !important; border-color: #69f0ae !important; color: #b9f6ca !important; }
-.opt-btn.wrong    { background: #7f0000 !important; border-color: #ff5252 !important; color: #ffcdd2 !important; }
-
-.modal-text {
-  font-size: 1rem;
-  line-height: 1.6;
-  text-align: center;
-  padding: 8px 4px;
-  color: var(--text);
-  margin-bottom: 12px;
-}
-
-.action-btn {
-  margin-top: 8px;
-  padding: 13px 24px;
-  border: none;
-  border-radius: 12px;
-  font-weight: 800;
-  font-size: 1rem;
-  cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  transition: transform .15s, box-shadow .2s;
-  width: 100%;
-}
-.action-btn:hover:not(:disabled) { transform: scale(1.03); }
-.action-btn:disabled { opacity: .6; cursor: default; transform: none; }
-.action-btn.green { background: var(--green-light); color: #0c2e10; }
-.action-btn.gray  { background: #777; color: #111; }
-
-/* ── FEEDBACK STRIP ── */
-.modal-feedback {
-  margin-top: 14px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: .9rem;
-  text-align: center;
-  display: none;
-  line-height: 1.5;
-  animation: fadeIn .3s ease;
-}
-
-@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-
-.modal-feedback.success { display: block; background: rgba(27,94,32,.7); border: 1px solid #69f0ae; color: #b9f6ca; }
-.modal-feedback.danger  { display: block; background: rgba(127,0,0,.7); border: 1px solid #ff5252; color: #ffcdd2; }
-.modal-feedback.info    { display: block; background: rgba(21,101,192,.5); border: 1px solid #42a5f5; color: #bbdefb; }
-
-.modal-continue {
-  margin-top: 12px;
-  padding: 11px;
-  border: none;
-  border-radius: 12px;
-  font-weight: 800;
-  font-size: .95rem;
-  cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  background: var(--gold);
-  color: #111;
-  width: 100%;
-  display: none;
-  transition: transform .15s;
-}
-.modal-continue:hover { transform: scale(1.03); }
-.modal-continue.visible { display: block; }
-
-/* ── RESULT ── */
-.result {
-  margin-top: 26px;
-  background: var(--bg3);
-  padding: 16px 22px;
-  border-radius: 14px;
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 600;
-  max-width: 700px;
-  width: 100%;
-  border: 1px solid var(--border);
-  min-height: 58px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 1;
-  transition: background .3s;
-  line-height: 1.5;
-}
-
-/* ── GAME OVER / WIN ── */
-.overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.85);
-  z-index: 400;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 18px;
-  text-align: center;
-  padding: 24px;
-  backdrop-filter: blur(4px);
-}
-
-.overlay.show { display: flex; }
-
-.overlay-box {
-  background: var(--bg2);
-  border-radius: 24px;
-  padding: 36px 40px;
-  border: 2px solid var(--border);
-  max-width: 420px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,.7);
-}
-
-.overlay-box h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 3rem;
-  letter-spacing: 3px;
-  margin-bottom: 10px;
-}
-
-.overlay-box p { color: var(--text-dim); margin-bottom: 20px; font-size: 1rem; }
-.overlay-box .score-big { font-size: 2.5rem; font-weight: 800; color: var(--gold); margin-bottom: 20px; }
-
-/* ── RESTART ── */
-.restart {
-  margin-top: 22px;
-  background: var(--gold);
-  color: #111;
-  padding: 13px 28px;
-  font-size: 1rem;
-  border-radius: 50px;
-  font-weight: 800;
-  cursor: pointer;
-  border: none;
-  transition: transform .2s, box-shadow .2s;
-  font-family: 'Nunito', sans-serif;
-  letter-spacing: .5px;
-  box-shadow: 0 4px 20px rgba(255,213,79,.3);
-  position: relative;
-  z-index: 1;
-}
-.restart:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,213,79,.45); }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: #1e3a26;
-  border: 1px solid var(--green-light);
-  color: var(--green-light);
-  padding: 12px 24px;
-  border-radius: 50px;
-  font-weight: 700;
-  font-size: .95rem;
-  z-index: 500;
-  transition: transform .4s cubic-bezier(.4,0,.2,1), opacity .4s;
-  opacity: 0;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-.toast.error { background: #3e0c0c; border-color: var(--red-light); color: var(--red-light); }
-.toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-/* ── RESPONSIVE ── */
-@media(max-width:680px){
-  .grid { grid-template-columns: repeat(2,1fr); }
-  .card { height: 140px; }
-}
 @media(max-width:420px){
-  .grid { grid-template-columns: 1fr 1fr; }
-  .card { height: 130px; }
-  .card .icon { font-size: 2rem; }
-  .card h2 { font-size: .85rem; }
-  .modal { padding: 24px 18px 20px; }
+  .grid{grid-template-columns:repeat(2,1fr);}
+  .card{aspect-ratio:1/1;}
 }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🎴 CARTAS DE RIESGO</h1>
-  <p class="sub">Juego SST — Trabajo en Alturas</p>
-</div>
+<button class="sound-btn" id="soundBtn">🔊</button>
 
-<div class="panel">
-  <div class="box">⭐ Puntos <span class="val" id="points">0</span></div>
-  <div class="box">❤️ Vidas <span class="val" id="lives">3</span></div>
-  <div class="box">✅ Cartas <span class="val" id="done">0</span>/<span id="total">0</span></div>
-</div>
+<!-- ══════════════════════════════
+     SCREEN 1: CARDS
+     ══════════════════════════════ -->
+<div class="screen active" id="screen-cards">
 
-<div class="progress-wrap">
-  <div class="progress-label">
-    <span>Progreso</span>
-    <span id="prog-pct">0%</span>
+  <div class="header">
+    <h1>🎴 CARTAS DE RIESGO</h1>
+    <p class="sub">Fase 1 — Trabajo en Alturas</p>
   </div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+
+  <div class="panel">
+    <div class="box">⭐ Puntos <span class="val" id="points">0</span></div>
+    <div class="box">❤️ Vidas  <span class="val" id="lives">3</span></div>
+    <div class="box">✅ Cartas <span class="val" id="done">0</span>/<span id="total">0</span></div>
   </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Progreso Fase 1</span><span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="result" id="result">Selecciona una carta para comenzar 👷‍♂️</div>
+  <button class="restart-btn" onclick="restartGame()">🔄 Reiniciar Juego</button>
 </div>
 
-<div class="grid" id="grid"></div>
+<!-- ══════════════════════════════
+     SCREEN 2: INVESTIGATION
+     ══════════════════════════════ -->
+<div class="screen" id="screen-investigation">
 
-<div class="result" id="result">Selecciona una carta para comenzar 👷‍♂️</div>
+  <div class="inv-intro">
+    <div class="badge">🚨 Accidente de Trabajo</div>
+    <h1>INVESTIGACIÓN AT</h1>
+    <p class="subtitle">Obra de construcción — Bogotá D.C.</p>
+  </div>
 
-<button class="restart" onclick="restartGame()">🔄 Reiniciar Juego</button>
+  <div class="score-carry" id="score-carry">
+    ⭐ Llevas <span id="carry-pts">0</span> puntos de la Fase 1
+  </div>
 
-<!-- ── MODAL ── -->
+  <div class="inv-stats">
+    <div class="inv-stat">🔍 Evidencias <span class="sv" id="ev-count">0</span>/6</div>
+    <div class="inv-stat">📋 Causas id. <span class="sv" id="cause-count">0</span>/4</div>
+    <div class="inv-stat">⭐ Total <span class="sv" id="total-pts">0</span></div>
+  </div>
+
+  <!-- Scenes render here -->
+  <div id="inv-scene-container" style="width:100%"></div>
+
+</div>
+
+<!-- ══════════════════════════════
+     MODAL (cards phase)
+     ══════════════════════════════ -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal" id="modal">
     <button class="modal-close" id="modal-close">✕</button>
-    <div class="modal-icon" id="modal-icon"></div>
-    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-header">
+      <div class="modal-icon" id="modal-icon"></div>
+      <div class="modal-title" id="modal-title"></div>
+    </div>
     <div id="modal-body"></div>
     <div class="modal-feedback" id="modal-feedback"></div>
     <button class="modal-continue" id="modal-continue">Cerrar ✕</button>
   </div>
 </div>
 
-<!-- ── OVERLAYS ── -->
-<div class="overlay" id="overlay-lose">
+<!-- Win Fase 1 -->
+<div class="overlay" id="overlay-win1">
   <div class="overlay-box">
-    <h2 style="color:#ef5350">💀 FIN</h2>
-    <p>Cometiste demasiados errores en alturas. La seguridad no admite descuidos.</p>
-    <div class="score-big" id="final-score-lose">0 pts</div>
-    <button class="restart" onclick="restartGame()">🔄 Intentar de nuevo</button>
+    <h2 style="color:#69f0ae">🏆 ¡FASE 1 COMPLETA!</h2>
+    <p>Superaste las Cartas de Riesgo. Ahora debes investigar el accidente de trabajo ocurrido en la obra.</p>
+    <div class="score-big" id="win1-score">0 pts</div>
+    <button class="next-btn" onclick="goToInvestigation()">🔎 Ir a Investigación AT →</button>
   </div>
 </div>
 
-<div class="overlay" id="overlay-win">
+<!-- Game Over -->
+<div class="overlay" id="overlay-lose">
   <div class="overlay-box">
-    <h2 style="color:#69f0ae">🏆 ¡VICTORIA!</h2>
-    <p>Completaste todas las cartas. Eres un experto en seguridad en alturas.</p>
-    <div class="score-big" id="final-score-win">0 pts</div>
-    <button class="restart" onclick="restartGame()">🔄 Jugar de nuevo</button>
+    <h2 style="color:#ef5350">💀 FIN DEL JUEGO</h2>
+    <p>Cometiste demasiados errores en alturas. La seguridad no admite descuidos.</p>
+    <div class="score-big" id="final-score-lose">0 pts</div>
+    <button class="restart-btn" onclick="restartGame()">🔄 Intentar de nuevo</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════
-//  AUDIO ENGINE (Web Audio API — sin archivos)
-// ═══════════════════════════════════════════
-let audioCtx = null;
-
-function getAudioCtx() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  return audioCtx;
+/* ══════════════════════════════════
+   AUDIO ENGINE
+   ══════════════════════════════════ */
+let audioCtx=null, soundOn=true;
+document.getElementById('soundBtn').addEventListener('click',()=>{
+  soundOn=!soundOn;
+  document.getElementById('soundBtn').textContent=soundOn?'🔊':'🔇';
+});
+function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function tone(freq,type,dur,vol,delay=0){
+  if(!soundOn)return;
+  try{
+    const c=getCtx(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type=type; o.frequency.setValueAtTime(freq,c.currentTime+delay);
+    g.gain.setValueAtTime(vol,c.currentTime+delay);
+    g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+delay+dur);
+    o.start(c.currentTime+delay); o.stop(c.currentTime+delay+dur+.05);
+  }catch(e){}
 }
-
-function playTone(freq, type, duration, gainVal, fadeOut=true) {
-  try {
-    const ctx = getAudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-    gain.gain.setValueAtTime(gainVal, ctx.currentTime);
-    if (fadeOut) gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + duration);
-  } catch(e) {}
+function noise(dur,vol=.07){
+  if(!soundOn)return;
+  try{
+    const c=getCtx(),buf=c.createBuffer(1,c.sampleRate*dur,c.sampleRate),d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const src=c.createBufferSource(); src.buffer=buf;
+    const g=c.createGain(); g.gain.setValueAtTime(vol,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+dur);
+    src.connect(g);g.connect(c.destination); src.start();src.stop(c.currentTime+dur);
+  }catch(e){}
 }
+const SFX={
+  flip()   {tone(600,'sine',.08,.18);tone(900,'sine',.08,.12,.07);},
+  correct(){tone(523,'sine',.12,.22);tone(659,'sine',.12,.22,.13);tone(784,'sine',.2,.28,.26);},
+  wrong()  {tone(300,'sawtooth',.14,.22);tone(200,'sawtooth',.22,.22,.15);},
+  protect(){[523,659,784,1047].forEach((f,i)=>tone(f,'sine',.15,.24,i*.1));},
+  danger() {noise(.1,.1);tone(180,'sawtooth',.28,.28,.1);},
+  win()    {[523,659,784,1047,1319].forEach((f,i)=>tone(f,'sine',.18,.26,i*.11));},
+  lose()   {[400,300,200,150].forEach((f,i)=>tone(f,'sawtooth',.2,.28,i*.13));},
+  click()  {tone(660,'sine',.1,.1);},
+  evidence(){tone(880,'sine',.1,.14);tone(1100,'sine',.12,.12,.09);},
+  reveal() {tone(440,'sine',.08,.1);tone(550,'sine',.1,.1,.07);}
+};
 
-function playCardFlip() {
-  // soft "whoosh" click
-  try {
-    const ctx = getAudioCtx();
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) {
-      data[i] = (Math.random()*2-1) * Math.pow(1 - i/data.length, 3);
-    }
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.value = 800;
-    src.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-    src.start();
-  } catch(e) {}
-  playTone(440, 'sine', 0.12, 0.08);
-}
-
-function playCorrect() {
-  // ascending chord: C-E-G
-  playTone(523.25, 'sine', 0.22, 0.18);
-  setTimeout(() => playTone(659.25, 'sine', 0.22, 0.18), 100);
-  setTimeout(() => playTone(783.99, 'sine', 0.35, 0.22), 200);
-}
-
-function playWrong() {
-  playTone(220, 'sawtooth', 0.18, 0.15);
-  setTimeout(() => playTone(196, 'sawtooth', 0.28, 0.15), 150);
-}
-
-function playProtect() {
-  // sparkle ascending
-  [523, 659, 784, 1047].forEach((f,i) => {
-    setTimeout(() => playTone(f, 'sine', 0.18, 0.14), i*80);
-  });
-}
-
-function playBlack() {
-  playTone(150, 'triangle', 0.5, 0.2);
-  setTimeout(() => playTone(120, 'sawtooth', 0.4, 0.18), 200);
-}
-
-function playVictory() {
-  const melody = [523,659,784,1047,784,1047,1319];
-  melody.forEach((f,i) => {
-    setTimeout(() => playTone(f, 'sine', 0.22, 0.2), i*120);
-  });
-}
-
-function playGameOver() {
-  const notes = [440,392,349,294];
-  notes.forEach((f,i) => {
-    setTimeout(() => playTone(f, 'sawtooth', 0.32, 0.16), i*160);
-  });
-}
-
-function playModalOpen() {
-  playTone(660, 'sine', 0.14, 0.1);
-  setTimeout(() => playTone(880, 'sine', 0.14, 0.08), 80);
-}
-
-// ═══════════════════════════════════════════
-//  CARD DATA
-// ═══════════════════════════════════════════
-const CARDS = [
-  {
-    type:'question', icon:'🏗️', title:'Altura Mínima',
-    question:'¿A partir de qué altura se considera trabajo en alturas según la normativa colombiana?',
-    options:['2.00 metros','50 centímetros','5 metros'],
-    correct:'2.00 metros'
-  },
-  {
-    type:'risk', icon:'⚠️', title:'Arnés Dañado',
-    question:'Encuentras que el arnés tiene costuras rotas. ¿Qué debes hacer?',
-    options:['Usarlo rápidamente','Reportarlo y reemplazarlo','Ignorarlo si es leve'],
-    correct:'Reportarlo y reemplazarlo'
-  },
-  {
-    type:'protect', icon:'🧰', title:'Kit de Rescate',
-    reward:'¡Excelente! Encontraste un kit de rescate completo. Ganas una vida extra. 🛡️'
-  },
-  {
-    type:'question', icon:'🪢', title:'Línea de Vida',
-    question:'¿Qué debe hacerse ANTES de usar una línea de vida horizontal?',
-    options:['Verificar su color','Realizar inspección completa','Nada si está nueva'],
-    correct:'Realizar inspección completa'
-  },
-  {
-    type:'black', icon:'💀', title:'Caída Libre',
-    penalty:'Trabajaste sin sistema de protección. Perdiste una vida por exposición al riesgo de caída.'
-  },
-  {
-    type:'question', icon:'👷', title:'Permiso de Alturas',
-    question:'¿Quién está autorizado para firmar un permiso de trabajo en alturas?',
-    options:['Supervisor autorizado y certificado','Cualquier trabajador senior','El visitante de obra'],
-    correct:'Supervisor autorizado y certificado'
-  },
-  {
-    type:'question', icon:'🧲', title:'Anclaje',
-    question:'¿Cuál es la resistencia mínima que debe soportar un punto de anclaje para trabajo en alturas?',
-    options:['500 kg','5000 libras (2270 kg)','1000 kg'],
-    correct:'5000 libras (2270 kg)'
-  },
-  {
-    type:'risk', icon:'🌧️', title:'Lluvia Intensa',
-    question:'Hay tormenta eléctrica activa. ¿Cuál es la acción correcta?',
-    options:['Continuar con casco','Suspender trabajo y descender','Usar impermeable y seguir'],
-    correct:'Suspender trabajo y descender'
-  },
-  {
-    type:'protect', icon:'⛑️', title:'Capacitación',
-    reward:'¡Completaste la capacitación anual en alturas! Ganas 10 puntos de bonificación. 🎓'
-  },
-  {
-    type:'question', icon:'🔗', title:'Doble Gancho',
-    question:'¿Cuándo se usa un conector de doble gancho (Y) en alturas?',
-    options:['Solo en techos','Para mantener conexión al desplazarse','En espacios confinados únicamente'],
-    correct:'Para mantener conexión al desplazarse'
-  },
-  {
-    type:'black', icon:'🌀', title:'Vértigo',
-    penalty:'No reportaste mareos antes de subir. Situación de riesgo inminente. Pierdes una vida.'
-  },
-  {
-    type:'question', icon:'📋', title:'APR',
-    question:'¿Qué significa APR en seguridad industrial?',
-    options:['Análisis de Peligros en Rampas','Análisis de Puesto de Riesgo','Análisis de Riesgo por Oficio'],
-    correct:'Análisis de Riesgo por Oficio'
-  }
+/* ══════════════════════════════════
+   CARDS DATA (Phase 1)
+   ══════════════════════════════════ */
+const CARDS=[
+  {type:'question',icon:'🏗️',title:'Altura Mínima',
+   question:'¿A partir de qué altura se considera trabajo en alturas según la normativa colombiana?',
+   options:['1.50 metros','50 centímetros','5 metros'],correct:'1.50 metros'},
+  {type:'risk',icon:'⚠️',title:'Arnés Dañado',
+   question:'Encuentras que el arnés tiene costuras rotas. ¿Qué debes hacer?',
+   options:['Usarlo rápidamente','Reportarlo y reemplazarlo','Ignorarlo si es leve'],correct:'Reportarlo y reemplazarlo'},
+  {type:'protect',icon:'🧰',title:'Kit de Rescate',
+   reward:'¡Excelente! Encontraste un kit de rescate completo. Ganas una vida extra. 🛡️'},
+  {type:'question',icon:'🪢',title:'Línea de Vida',
+   question:'¿Qué debe hacerse ANTES de usar una línea de vida horizontal?',
+   options:['Verificar su color','Realizar inspección completa','Nada si está nueva'],correct:'Realizar inspección completa'},
+  {type:'black',icon:'💀',title:'Caída Libre',
+   penalty:'Trabajaste sin sistema de protección. Perdiste una vida por exposición al riesgo de caída.'},
+  {type:'question',icon:'👷',title:'Permiso Alturas',
+   question:'¿Quién está autorizado para firmar un permiso de trabajo en alturas?',
+   options:['Supervisor autorizado y certificado','Cualquier trabajador senior','El visitante de obra'],correct:'Supervisor autorizado y certificado'},
+  {type:'question',icon:'🧲',title:'Anclaje',
+   question:'¿Cuál es la resistencia mínima de un punto de anclaje para trabajo en alturas?',
+   options:['500 kg','5000 libras (2270 kg)','1000 kg'],correct:'5000 libras (2270 kg)'},
+  {type:'risk',icon:'🌧️',title:'Tormenta Activa',
+   question:'Hay tormenta eléctrica activa. ¿Cuál es la acción correcta?',
+   options:['Continuar con casco dieléctrico','Suspender trabajo y descender','Usar impermeable y seguir'],correct:'Suspender trabajo y descender'},
+  {type:'protect',icon:'⛑️',title:'Capacitación',
+   reward:'¡Completaste la capacitación anual! Ganas 10 puntos de bonificación. 🎓'},
+  {type:'question',icon:'🔗',title:'Doble Gancho',
+   question:'¿Cuándo se usa un conector en Y (doble gancho)?',
+   options:['Solo en techos','Para mantener conexión al desplazarse','En espacios confinados'],correct:'Para mantener conexión al desplazarse'},
+  {type:'black',icon:'🌀',title:'Vértigo',
+   penalty:'No reportaste mareos antes de subir. Situación de riesgo inminente. Pierdes una vida.'},
+  {type:'question',icon:'📋',title:'APR',
+   question:'¿Qué significa APR en seguridad industrial?',
+   options:['Análisis de Peligros en Rampas','Análisis de Puesto de Riesgo','Análisis de Riesgo por Oficio'],correct:'Análisis de Riesgo por Oficio'}
 ];
 
-// ═══════════════════════════════════════════
-//  GAME STATE
-// ═══════════════════════════════════════════
-let points = 0, lives = 3, doneCount = 0, totalCards = 0, gameOver = false;
-let activeCardEl = null;  // card element currently open in modal
-let modalAnswered = false; // whether current modal interaction is resolved
+/* ══════════════════════════════════
+   INVESTIGATION DATA (Phase 2)
+   ══════════════════════════════════ */
+/*
+  CASO: Trabajador Juan García, 34 años, operario de obra
+  cayó desde el 4.° piso (aprox. 12 m) durante instalación
+  de formaleta. Resultó con fractura de pelvis y columna.
+  
+  Causas raíz a identificar:
+  1. Sin sistema anticaídas (causa básica — acto inseguro)
+  2. Andamio sin barandas (causa básica — condición insegura)
+  3. Sin permiso de trabajo (causa directa)
+  4. Falta de supervisión SST (causa raíz)
+*/
 
-const grid      = document.getElementById('grid');
-const resultEl  = document.getElementById('result');
-const pointsEl  = document.getElementById('points');
-const livesEl   = document.getElementById('lives');
-const doneEl    = document.getElementById('done');
-const totalEl   = document.getElementById('total');
-const fillEl    = document.getElementById('progress-fill');
-const pctEl     = document.getElementById('prog-pct');
-const toastEl   = document.getElementById('toast');
+const INVESTIGATION={
+  foundCauses: new Set(),
+  foundEvidence: new Set(),
+  phase2Points: 0,
+
+  scenes:[
+    // ─── SCENE 0: ARRIVAL ───
+    {
+      id:'arrival',
+      tag:'decision', tagIcon:'🚨',
+      title:'Llegada a la Escena',
+      narr:`Son las 10:42 a.m. Recibes la llamada: un operario cayó desde el cuarto piso de la obra "Torres del Río". Al llegar, hay caos. El trabajador Juan García (34 años) fue trasladado al hospital. El frente de trabajo está activo todavía.\n\n¿Cuál es tu primera acción como investigador?`,
+      type:'choice',
+      choices:[
+        {icon:'🚧',text:'Asegurar y aislar el área del accidente inmediatamente',correct:true,
+         feedback:'✅ Correcto. Preservar la escena es fundamental para no perder evidencias ni generar un segundo accidente.'},
+        {icon:'📞',text:'Llamar al gerente de la empresa para informar',correct:false,
+         feedback:'❌ El gerente puede esperar. Lo urgente es preservar la escena y evitar que se altere la evidencia.'},
+        {icon:'📸',text:'Tomar fotos desde lejos y retirarte',correct:false,
+         feedback:'❌ Documentar a distancia sin asegurar el área puede poner en riesgo a otros trabajadores y perder evidencia clave.'}
+      ],
+      points:{correct:10,wrong:0}
+    },
+    // ─── SCENE 1: EVIDENCE ───
+    {
+      id:'evidence',
+      tag:'evidence', tagIcon:'🔍',
+      title:'Recolección de Evidencias',
+      narr:'Tienes 10 minutos antes de que el área sea intervenida. Identifica y recolecta las evidencias más relevantes del accidente. Toca cada ítem para recolectarlo.',
+      type:'evidence',
+      items:[
+        {id:'e1',icon:'🪜',label:'Andamio sin barandilla lateral — 4.° piso',cause:'cause2',points:15},
+        {id:'e2',icon:'🦺',label:'Arnés de seguridad encontrado en el piso (no puesto)',cause:'cause1',points:15},
+        {id:'e3',icon:'📋',label:'Carpeta de permisos de trabajo — ninguno firmado hoy',cause:'cause3',points:15},
+        {id:'e4',icon:'📷',label:'Fotografías del punto de anclaje inexistente',cause:'cause1',points:10},
+        {id:'e5',icon:'🗒️',label:'Lista de asistencia sin registro de charla de seguridad',cause:'cause4',points:10},
+        {id:'e6',icon:'🔩',label:'Tablón de madera deteriorado en el andamio',cause:'cause2',points:10}
+      ]
+    },
+    // ─── SCENE 2: WITNESS 1 ───
+    {
+      id:'witness1',
+      tag:'witness', tagIcon:'🗣️',
+      title:'Testigo 1 — Compañero de trabajo',
+      narr:'"Yo estaba abajo cuando pasó. Juan subió al andamio a las 10:30. Yo le dije que se pusiera el arnés pero dijo que era un momento nada más. Nadie del área de seguridad estaba por acá esta mañana."',
+      type:'choice',
+      choices:[
+        {icon:'📝',text:'Registrar: acto inseguro (no uso de EPP) y ausencia de supervisión SST',correct:true,
+         feedback:'✅ Correcto. El testimonio evidencia dos causas clave: acto inseguro del trabajador y falla de supervisión del área de SST.',cause:['cause1','cause4']},
+        {icon:'🤷',text:'Ignorar el testimonio — el trabajador es el único responsable',correct:false,
+         feedback:'❌ Error grave. La investigación de AT busca causas sistémicas, no culpabilizar. La ausencia de supervisión es una causa raíz importante.'},
+        {icon:'📣',text:'Publicar el nombre del compañero como responsable',correct:false,
+         feedback:'❌ Incorrecto. El proceso de investigación es confidencial y no busca sancionar testigos sino identificar causas para prevenirlas.'}
+      ],
+      points:{correct:15,wrong:0}
+    },
+    // ─── SCENE 3: WITNESS 2 ───
+    {
+      id:'witness2',
+      tag:'witness', tagIcon:'🗣️',
+      title:'Testigo 2 — Maestro de obra',
+      narr:'"Ese andamio lo armaron ayer tarde. Yo les dije que le faltaban las barandas pero el interventor dijo que igual tocaba avanzar porque había atraso en el cronograma. Nunca llegó el supervisor de SST a verificarlo."',
+      type:'choice',
+      choices:[
+        {icon:'📝',text:'Registrar: presión por cronograma como causa raíz y condición insegura en andamio',correct:true,
+         feedback:'✅ Excelente análisis. La presión del cronograma es una causa raíz organizacional. El andamio sin barandas es una condición insegura verificada.',cause:['cause2','cause4']},
+        {icon:'⚠️',text:'Suspender la investigación — es culpa del interventor',correct:false,
+         feedback:'❌ No se trata de culpa personal. La presión de producción sobre la seguridad es una causa sistémica que debe documentarse.'},
+        {icon:'🙈',text:'No registrar nada — puede generar conflictos legales',correct:false,
+         feedback:'❌ Omitir evidencia compromete la investigación y viola el Decreto 1072. Toda causa debe quedar documentada.'}
+      ],
+      points:{correct:15,wrong:0}
+    },
+    // ─── SCENE 4: DOCUMENTS ───
+    {
+      id:'documents',
+      tag:'analysis', tagIcon:'📋',
+      title:'Revisión Documental',
+      narr:'Revisas el archivo de la obra. El Permiso de Trabajo en Alturas (PTA) no tiene firma del supervisor ni del trabajador para el día de hoy. El plan de trabajo de andamios tampoco tiene verificación de la semana.',
+      type:'choice',
+      choices:[
+        {icon:'✅',text:'Identificar: incumplimiento del PTA como causa directa del accidente',correct:true,
+         feedback:'✅ Correcto. La falta de permiso de trabajo firmado es una causa directa según la metodología de árbol de causas (OHSAS / GTC-45).',cause:['cause3']},
+        {icon:'🗄️',text:'Archivar los documentos sin analizarlos — son solo papeles',correct:false,
+         feedback:'❌ Los documentos son evidencia clave. Ignorarlos impide construir el árbol de causas correctamente.'},
+        {icon:'✏️',text:'Completar los permisos ahora para evitar problemas legales',correct:false,
+         feedback:'❌ Falsificar documentos de seguridad es un delito. Los documentos deben conservarse tal como estaban.'}
+      ],
+      points:{correct:15,wrong:0}
+    },
+    // ─── SCENE 5: CAUSE TREE ───
+    {
+      id:'causetree',
+      tag:'analysis', tagIcon:'🌲',
+      title:'Árbol de Causas',
+      narr:'Con toda la información recolectada, construyes el árbol de causas del accidente. Selecciona cuál de las siguientes opciones representa correctamente las causas identificadas:',
+      type:'choice',
+      choices:[
+        {icon:'🌳',text:'Caída ← Sin anticaídas (acto inseguro) + Andamio sin barandas (condición insegura) ← Sin PTA (causa directa) ← Sin supervisión SST + Presión cronograma (causas raíz)',correct:true,
+         feedback:'✅ ¡Árbol de causas correcto! Identificaste la cadena causal completa: desde el acto inseguro hasta las causas organizacionales raíz.',cause:['cause1','cause2','cause3','cause4']},
+        {icon:'👤',text:'La única causa fue el descuido del trabajador Juan García',correct:false,
+         feedback:'❌ Reducir un AT a un solo acto inseguro individual es un error metodológico. Siempre existen causas sistémicas detrás.'},
+        {icon:'📊',text:'Causa raíz única: mala suerte en la hora del accidente',correct:false,
+         feedback:'❌ Los accidentes de trabajo no son producto del azar. Tienen causas identificables y prevenibles.'}
+      ],
+      points:{correct:20,wrong:0}
+    },
+    // ─── SCENE 6: RECOMMENDATIONS ───
+    {
+      id:'recommendations',
+      tag:'decision', tagIcon:'🛡️',
+      title:'Plan de Acción Correctivo',
+      narr:'El informe de investigación está casi listo. ¿Cuál debe ser el enfoque principal del plan de acción correctivo?',
+      type:'choice',
+      choices:[
+        {icon:'🔧',text:'Sancionar al trabajador, instalar barandas y exigir PTA firmado en adelante',correct:false,
+         feedback:'❌ Sancionar al trabajador no es la prioridad. El enfoque debe ser sistémico: controles en la fuente, en el medio y en el individuo.'},
+        {icon:'🏗️',text:'Controles de ingeniería (andamios seguros) + controles administrativos (PTA, supervisión) + EPP obligatorio + capacitación',correct:true,
+         feedback:'✅ ¡Excelente! El plan de acción debe ser integral: jerarquía de controles desde la fuente hasta el individuo. Eso es SST de verdad.'},
+        {icon:'📃',text:'Solo aumentar la cartelería de seguridad en la obra',correct:false,
+         feedback:'❌ La señalización sola es la medida más débil según la jerarquía de controles. No corrige las causas identificadas.'}
+      ],
+      points:{correct:20,wrong:0}
+    }
+  ]
+};
+
+/* ══════════════════════════════════
+   PHASE 1 STATE
+   ══════════════════════════════════ */
+let points=0,lives=3,doneCount=0,totalCards=0,gameOver=false;
+let activeCardEl=null, modalAnswered=false;
+
+const grid        = document.getElementById('grid');
+const resultEl    = document.getElementById('result');
+const pointsEl    = document.getElementById('points');
+const livesEl     = document.getElementById('lives');
+const doneEl      = document.getElementById('done');
+const totalEl     = document.getElementById('total');
+const fillEl      = document.getElementById('progress-fill');
+const pctEl       = document.getElementById('prog-pct');
+const toastEl     = document.getElementById('toast');
+const modalBackdrop = document.getElementById('modal-backdrop');
+const modalEl     = document.getElementById('modal');
+const modalIconEl = document.getElementById('modal-icon');
+const modalTitleEl= document.getElementById('modal-title');
+const modalBodyEl = document.getElementById('modal-body');
+const modalFeedback=document.getElementById('modal-feedback');
+const modalContinue=document.getElementById('modal-continue');
+const modalCloseBtn=document.getElementById('modal-close');
 let toastTimer;
 
-const modalBackdrop  = document.getElementById('modal-backdrop');
-const modalEl        = document.getElementById('modal');
-const modalIconEl    = document.getElementById('modal-icon');
-const modalTitleEl   = document.getElementById('modal-title');
-const modalBodyEl    = document.getElementById('modal-body');
-const modalFeedback  = document.getElementById('modal-feedback');
-const modalContinue  = document.getElementById('modal-continue');
-const modalCloseBtn  = document.getElementById('modal-close');
-
-// ── TOAST ──
-function showToast(msg, type='success') {
+function showToast(msg,type='success'){
   clearTimeout(toastTimer);
-  toastEl.textContent = msg;
-  toastEl.className = 'toast' + (type==='error' ? ' error' : '');
-  requestAnimationFrame(()=>{ toastEl.classList.add('visible'); });
-  toastTimer = setTimeout(()=>{ toastEl.classList.remove('visible'); }, 2800);
+  toastEl.textContent=msg;
+  toastEl.className='toast'+(type==='error'?' error':type==='info'?' info':'');
+  requestAnimationFrame(()=>toastEl.classList.add('visible'));
+  toastTimer=setTimeout(()=>toastEl.classList.remove('visible'),2800);
 }
-
-function bumpVal(el) {
-  el.classList.remove('bump');
-  void el.offsetWidth;
-  el.classList.add('bump');
+function bumpVal(el){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}
+function updatePanel(){
+  pointsEl.textContent=points; livesEl.textContent=Math.max(0,lives); doneEl.textContent=doneCount;
+  const pct=totalCards?Math.round((doneCount/totalCards)*100):0;
+  fillEl.style.width=pct+'%'; pctEl.textContent=pct+'%';
 }
+function markUsed(cardEl){setTimeout(()=>cardEl.classList.add('used'),400);}
 
-function updatePanel() {
-  pointsEl.textContent = points;
-  livesEl.textContent  = Math.max(0, lives);
-  doneEl.textContent   = doneCount;
-  const pct = totalCards ? Math.round((doneCount/totalCards)*100) : 0;
-  fillEl.style.width = pct + '%';
-  pctEl.textContent  = pct + '%';
-}
-
-function markUsed(cardEl) {
-  setTimeout(()=>{ cardEl.classList.add('used'); }, 400);
-}
-
-function verifyGame() {
-  if (gameOver) return;
-  if (lives <= 0) {
-    gameOver = true; lives = 0; updatePanel();
-    setTimeout(()=>{
-      playGameOver();
-      document.getElementById('final-score-lose').textContent = points + ' pts';
-      document.getElementById('overlay-lose').classList.add('show');
-    }, 900);
+function verifyGame(){
+  if(gameOver)return;
+  if(lives<=0){
+    gameOver=true;lives=0;updatePanel();
+    setTimeout(()=>{SFX.lose();document.getElementById('final-score-lose').textContent=points+' pts';document.getElementById('overlay-lose').classList.add('show');},900);
     return;
   }
-  if (doneCount >= totalCards) {
-    gameOver = true;
+  if(doneCount>=totalCards){
+    gameOver=true;
     setTimeout(()=>{
-      playVictory();
-      document.getElementById('final-score-win').textContent = points + ' pts';
-      document.getElementById('overlay-win').classList.add('show');
-    }, 600);
+      SFX.win();
+      document.getElementById('win1-score').textContent=points+' pts';
+      document.getElementById('overlay-win1').classList.add('show');
+    },600);
   }
 }
 
-// ── MODAL HELPERS ──
-function openModal(card, cardEl) {
-  playCardFlip();
-  setTimeout(playModalOpen, 80);
-
-  activeCardEl = cardEl;
-  modalAnswered = false;
-
-  // reset state
-  modalFeedback.className = 'modal-feedback';
+/* MODAL */
+function openModal(card,cardEl){
+  SFX.flip();
+  activeCardEl=cardEl; modalAnswered=false;
+  modalFeedback.className='modal-feedback';
   modalContinue.classList.remove('visible');
-  modalCloseBtn.style.display = 'flex';
+  modalCloseBtn.style.display='flex';
+  modalIconEl.textContent=card.icon;
+  modalTitleEl.textContent=card.title;
+  modalEl.className='modal '+card.type;
+  modalBodyEl.innerHTML='';
 
-  modalIconEl.textContent = card.icon;
-  modalTitleEl.textContent = card.title;
-  modalEl.className = 'modal ' + card.type;
-
-  modalBodyEl.innerHTML = '';
-
-  if (card.type === 'question' || card.type === 'risk') {
-    const q = document.createElement('p');
-    q.className = 'modal-question';
-    q.textContent = card.question;
-    modalBodyEl.appendChild(q);
-
-    const btnsDiv = document.createElement('div');
-    btnsDiv.className = 'modal-btns';
-
-    const checkFn = card.type === 'question' ? checkAnswer : checkRisk;
-
-    card.options.forEach(op => {
-      const b = document.createElement('button');
-      b.className = 'opt-btn';
-      b.textContent = op;
-      b.dataset.val = op;
-      b.addEventListener('click', () => {
-        if (modalAnswered) return;
-        modalAnswered = true;
-        const allBtns = [...btnsDiv.querySelectorAll('.opt-btn')];
-        checkFn(allBtns, op, card.correct, cardEl);
+  if(card.type==='question'||card.type==='risk'){
+    const q=document.createElement('p');q.className='modal-question';q.textContent=card.question;modalBodyEl.appendChild(q);
+    const btnsDiv=document.createElement('div');btnsDiv.className='modal-btns';
+    const checkFn=card.type==='question'?checkAnswer:checkRisk;
+    card.options.forEach(op=>{
+      const b=document.createElement('button');b.className='opt-btn';b.textContent=op;b.dataset.val=op;
+      b.addEventListener('click',()=>{
+        if(modalAnswered)return; modalAnswered=true;
+        const allBtns=[...btnsDiv.querySelectorAll('.opt-btn')];
+        checkFn(allBtns,op,card.correct,cardEl);
       });
       btnsDiv.appendChild(b);
     });
-
     modalBodyEl.appendChild(btnsDiv);
-
-  } else if (card.type === 'protect') {
-    const isBonus = card.reward.includes('puntos');
-    const p = document.createElement('p');
-    p.className = 'modal-text';
-    p.textContent = card.reward;
-    modalBodyEl.appendChild(p);
-
-    const btn = document.createElement('button');
-    btn.className = 'action-btn green';
-    btn.textContent = isBonus ? '🎓 Recibir bonificación' : '🛡️ Recibir vida';
-    btn.addEventListener('click', () => {
-      if (modalAnswered) return;
-      modalAnswered = true;
-      btn.disabled = true;
-      gainLife(cardEl, isBonus);
-    });
+  }else if(card.type==='protect'){
+    const isBonus=card.reward.includes('puntos');
+    const p=document.createElement('p');p.className='modal-text';p.textContent=card.reward;modalBodyEl.appendChild(p);
+    const btn=document.createElement('button');btn.className='action-btn green';
+    btn.textContent=isBonus?'🎓 Recibir bonificación':'🛡️ Recibir vida';
+    btn.addEventListener('click',()=>{if(modalAnswered)return;modalAnswered=true;btn.disabled=true;gainLife(cardEl,isBonus);});
     modalBodyEl.appendChild(btn);
-
-  } else if (card.type === 'black') {
-    const p = document.createElement('p');
-    p.className = 'modal-text';
-    p.textContent = card.penalty;
-    modalBodyEl.appendChild(p);
-
-    const btn = document.createElement('button');
-    btn.className = 'action-btn gray';
-    btn.textContent = '⚠️ Continuar';
-    btn.addEventListener('click', () => {
-      if (modalAnswered) return;
-      modalAnswered = true;
-      btn.disabled = true;
-      loseLife(cardEl);
-    });
+  }else if(card.type==='black'){
+    const p=document.createElement('p');p.className='modal-text';p.textContent=card.penalty;modalBodyEl.appendChild(p);
+    const btn=document.createElement('button');btn.className='action-btn gray';btn.textContent='⚠️ Continuar';
+    btn.addEventListener('click',()=>{if(modalAnswered)return;modalAnswered=true;btn.disabled=true;loseLife(cardEl);});
     modalBodyEl.appendChild(btn);
   }
 
   modalBackdrop.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
+}
+function closeModal(){modalBackdrop.classList.remove('open');document.body.style.overflow='';activeCardEl=null;}
+modalCloseBtn.addEventListener('click',closeModal);
+modalContinue.addEventListener('click',closeModal);
+modalBackdrop.addEventListener('click',e=>{if(e.target===modalBackdrop)closeModal();});
+function showModalFeedback(msg,type){
+  modalFeedback.textContent=msg; modalFeedback.className='modal-feedback '+type;
+  modalContinue.classList.add('visible'); modalCloseBtn.style.display='none';
 }
 
-function closeModal() {
-  modalBackdrop.classList.remove('open');
-  document.body.style.overflow = '';
-  activeCardEl = null;
+function checkAnswer(btns,selected,correct,cardEl){
+  if(gameOver)return;
+  btns.forEach(b=>{b.disabled=true;if(b.dataset.val===correct)b.classList.add('correct');if(b.dataset.val===selected&&selected!==correct)b.classList.add('wrong');});
+  if(selected===correct){SFX.correct();points+=10;bumpVal(pointsEl);resultEl.textContent='✅ ¡Correcto! +10 puntos.';showToast('✅ ¡Correcto! +10 pts');showModalFeedback('✅ ¡Correcto! +10 puntos','success');}
+  else{SFX.wrong();lives--;bumpVal(livesEl);resultEl.textContent='❌ Incorrecto. -1 vida.';showToast('❌ Incorrecto. -1 vida','error');showModalFeedback(`❌ La correcta era: "${correct}" — 1 vida`,'danger');}
+  doneCount++;updatePanel();markUsed(cardEl);verifyGame();
+}
+function checkRisk(btns,selected,correct,cardEl){
+  if(gameOver)return;
+  btns.forEach(b=>{b.disabled=true;if(b.dataset.val===correct)b.classList.add('correct');if(b.dataset.val===selected&&selected!==correct)b.classList.add('wrong');});
+  if(selected===correct){SFX.correct();points+=15;bumpVal(pointsEl);resultEl.textContent='🛡️ ¡Buena decisión! +15 puntos.';showToast('🛡️ ¡Excelente! +15 pts');showModalFeedback('🛡️ ¡Buena decisión! +15 puntos','success');}
+  else{SFX.wrong();lives--;bumpVal(livesEl);resultEl.textContent='🚨 Mala decisión. -1 vida.';showToast('🚨 Incorrecto. -1 vida','error');showModalFeedback(`🚨 Correcto: "${correct}" — 1 vida`,'danger');}
+  doneCount++;updatePanel();markUsed(cardEl);verifyGame();
+}
+function gainLife(cardEl,isBonus){
+  if(gameOver)return; SFX.protect();
+  if(isBonus){points+=10;bumpVal(pointsEl);resultEl.textContent='🎓 +10 pts bonificación.';showToast('🎓 +10 pts');showModalFeedback('🎓 +10 puntos de bonificación','info');}
+  else{lives++;bumpVal(livesEl);resultEl.textContent='💚 ¡Vida extra!';showToast('💚 +1 vida');showModalFeedback('💚 +1 vida extra obtenida!','success');}
+  doneCount++;updatePanel();markUsed(cardEl);verifyGame();
+}
+function loseLife(cardEl){
+  if(gameOver)return; SFX.danger(); lives--;bumpVal(livesEl);
+  resultEl.textContent='💀 Perdiste una vida.';showToast('💀 -1 vida','error');
+  showModalFeedback('💀 Perdiste una vida. Atención al protocolo.','danger');
+  doneCount++;updatePanel();markUsed(cardEl);verifyGame();
 }
 
-modalCloseBtn.addEventListener('click', closeModal);
-modalContinue.addEventListener('click', closeModal);
-modalBackdrop.addEventListener('click', (e) => {
-  if (e.target === modalBackdrop) closeModal();
-});
-
-function showModalFeedback(msg, type) {
-  modalFeedback.textContent = msg;
-  modalFeedback.className = 'modal-feedback ' + type;
-  modalContinue.classList.add('visible');
-  modalCloseBtn.style.display = 'none';
-}
-
-// ── GAME LOGIC ──
-function checkAnswer(btns, selected, correct, cardEl) {
-  if (gameOver) return;
-  btns.forEach(b => {
-    b.disabled = true;
-    if (b.dataset.val === correct) b.classList.add('correct');
-    if (b.dataset.val === selected && selected !== correct) b.classList.add('wrong');
-  });
-
-  if (selected === correct) {
-    playCorrect();
-    points += 10; bumpVal(pointsEl);
-    resultEl.textContent = '✅ ¡Correcto! +10 puntos. Buen conocimiento en seguridad.';
-    showToast('✅ ¡Correcto! +10 pts');
-    showModalFeedback('✅ ¡Correcto! +10 puntos', 'success');
-  } else {
-    playWrong();
-    lives--; bumpVal(livesEl);
-    resultEl.textContent = '❌ Incorrecto. Error de seguridad detectado. -1 vida.';
-    showToast('❌ Respuesta incorrecta. -1 vida', 'error');
-    showModalFeedback(`❌ Incorrecto. La respuesta correcta era: "${correct}" — 1 vida`, 'danger');
-  }
-
-  doneCount++; updatePanel(); markUsed(cardEl); verifyGame();
-}
-
-function checkRisk(btns, selected, correct, cardEl) {
-  if (gameOver) return;
-  btns.forEach(b => {
-    b.disabled = true;
-    if (b.dataset.val === correct) b.classList.add('correct');
-    if (b.dataset.val === selected && selected !== correct) b.classList.add('wrong');
-  });
-
-  if (selected === correct) {
-    playCorrect();
-    points += 15; bumpVal(pointsEl);
-    resultEl.textContent = '🛡️ ¡Buena decisión! +15 puntos. Acción de seguridad correcta.';
-    showToast('🛡️ ¡Excelente! +15 pts');
-    showModalFeedback('🛡️ ¡Buena decisión! +15 puntos', 'success');
-  } else {
-    playWrong();
-    lives--; bumpVal(livesEl);
-    resultEl.textContent = '🚨 Mala decisión. Riesgo crítico no atendido. -1 vida.';
-    showToast('🚨 Decisión incorrecta. -1 vida', 'error');
-    showModalFeedback(`🚨 Decisión incorrecta. Correcto: "${correct}" — 1 vida`, 'danger');
-  }
-
-  doneCount++; updatePanel(); markUsed(cardEl); verifyGame();
-}
-
-function gainLife(cardEl, isBonus) {
-  if (gameOver) return;
-  playProtect();
-  if (isBonus) {
-    points += 10; bumpVal(pointsEl);
-    resultEl.textContent = '🎓 ¡Bonificación aplicada! +10 puntos extra.';
-    showToast('🎓 +10 pts de bonificación');
-    showModalFeedback('🎓 +10 puntos de bonificación aplicados', 'info');
-  } else {
-    lives++; bumpVal(livesEl);
-    resultEl.textContent = '💚 ¡Protección activada! Obtuviste una vida extra.';
-    showToast('💚 +1 vida extra obtenida');
-    showModalFeedback('💚 ¡+1 vida extra obtenida!', 'success');
-  }
-  doneCount++; updatePanel(); markUsed(cardEl); verifyGame();
-}
-
-function loseLife(cardEl) {
-  if (gameOver) return;
-  playBlack();
-  lives--; bumpVal(livesEl);
-  resultEl.textContent = '💀 Caída detectada. Perdiste una vida por incumplimiento.';
-  showToast('💀 -1 vida por riesgo', 'error');
-  showModalFeedback('💀 Perdiste una vida. Atención al protocolo de seguridad.', 'danger');
-  doneCount++; updatePanel(); markUsed(cardEl); verifyGame();
-}
-
-// ── RENDER ──
-function badgeLabel(type) {
-  const map = { question:'Pregunta', risk:'Riesgo', protect:'Protección', black:'Peligro' };
-  return map[type] || type;
-}
-
-function renderCards() {
-  grid.innerHTML = '';
-  const shuffled = [...CARDS].sort(()=>Math.random()-.5);
-  totalCards = shuffled.length;
-  totalEl.textContent = totalCards;
-
-  shuffled.forEach((card) => {
-    const div = document.createElement('div');
-    div.className = 'card';
-
-    div.innerHTML = `
-      <span class="type-badge badge-${card.type}">${badgeLabel(card.type)}</span>
-      <div class="icon">${card.icon}</div>
-      <h2>${card.title}</h2>
-      <span class="tap-hint">Toca para ver</span>
-    `;
-
-    div.addEventListener('click', () => {
-      if (div.classList.contains('used') || gameOver) return;
-      openModal(card, div);
-    });
-
+function badgeLabel(t){return{question:'Pregunta',risk:'Riesgo',protect:'Protección',black:'Peligro'}[t]||t;}
+function renderCards(){
+  grid.innerHTML='';
+  const shuffled=[...CARDS].sort(()=>Math.random()-.5);
+  totalCards=shuffled.length; totalEl.textContent=totalCards;
+  shuffled.forEach(card=>{
+    const div=document.createElement('div');
+    div.className=`card type-${card.type}`;
+    div.innerHTML=`<span class="type-badge badge-${card.type}">${badgeLabel(card.type)}</span><div class="icon">${card.icon}</div><h2>${card.title}</h2><span class="tap-hint">Toca para ver</span>`;
+    div.addEventListener('click',()=>{if(div.classList.contains('used')||gameOver)return;openModal(card,div);});
     grid.appendChild(div);
   });
 }
-
-function restartGame() {
-  points = 0; lives = 3; doneCount = 0; gameOver = false;
+function restartGame(){
+  points=0;lives=3;doneCount=0;gameOver=false;
+  INVESTIGATION.foundCauses.clear();INVESTIGATION.foundEvidence.clear();INVESTIGATION.phase2Points=0;
   document.getElementById('overlay-lose').classList.remove('show');
-  document.getElementById('overlay-win').classList.remove('show');
-  closeModal();
-  updatePanel();
-  resultEl.textContent = '🔄 Juego reiniciado. ¡Selecciona una carta! 👷‍♂️';
+  document.getElementById('overlay-win1').classList.remove('show');
+  closeModal();updatePanel();
+  resultEl.textContent='🔄 Reiniciado. ¡Selecciona una carta! 👷‍♂️';
+  document.getElementById('screen-cards').classList.add('active');
+  document.getElementById('screen-investigation').classList.remove('active');
   renderCards();
 }
 
-renderCards();
-updatePanel();
+renderCards(); updatePanel();
+
+/* ══════════════════════════════════
+   PHASE 2 — INVESTIGATION ENGINE
+   ══════════════════════════════════ */
+let currentSceneIdx=0;
+
+function goToInvestigation(){
+  document.getElementById('overlay-win1').classList.remove('show');
+  document.getElementById('screen-cards').classList.remove('active');
+  document.getElementById('screen-investigation').classList.add('active');
+  document.getElementById('carry-pts').textContent=points;
+  document.getElementById('total-pts').textContent=points;
+  currentSceneIdx=0;
+  INVESTIGATION.foundCauses.clear();
+  INVESTIGATION.foundEvidence.clear();
+  INVESTIGATION.phase2Points=0;
+  updateInvStats();
+  renderScene(0);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateInvStats(){
+  document.getElementById('ev-count').textContent=INVESTIGATION.foundEvidence.size;
+  document.getElementById('cause-count').textContent=INVESTIGATION.foundCauses.size;
+  document.getElementById('total-pts').textContent=points+INVESTIGATION.phase2Points;
+}
+
+function renderScene(idx){
+  const container=document.getElementById('inv-scene-container');
+  const scene=INVESTIGATION.scenes[idx];
+  if(!scene){showFinalReport();return;}
+
+  const card=document.createElement('div');
+  card.className='scene-card';
+
+  const tagColors={evidence:'evidence',witness:'witness',decision:'decision',analysis:'analysis'};
+  const tagClass=tagColors[scene.tag]||'decision';
+
+  let html=`
+    <div class="scene-tag ${tagClass}">${scene.tagIcon} ${scene.tag.toUpperCase()}</div>
+    <div class="scene-title">${scene.title}</div>
+    <div class="scene-narr">${scene.narr.replace(/\n/g,'<br>')}</div>
+  `;
+
+  if(scene.type==='evidence'){
+    html+=`<div class="evidence-list" id="ev-list-${idx}">`;
+    scene.items.forEach(item=>{
+      html+=`<div class="ev-item" id="ev-${item.id}" data-id="${item.id}" data-cause="${item.cause}" data-pts="${item.points}">
+        <div class="ev-icon">${item.icon}</div>
+        <div class="ev-label">${item.label}</div>
+        <div class="ev-check">✓</div>
+      </div>`;
+    });
+    html+=`</div>`;
+    html+=`<div class="scene-feedback neutral" id="ev-hint-${idx}" style="display:block">
+      🔍 Toca cada evidencia para recolectarla. Recoge las 6 para continuar.
+    </div>`;
+    html+=`<button class="scene-next-btn" id="ev-next-${idx}">Siguiente →</button>`;
+  }else if(scene.type==='choice'){
+    html+=`<div class="choices" id="choices-${idx}">`;
+    scene.choices.forEach((ch,ci)=>{
+      html+=`<button class="choice-btn" data-idx="${idx}" data-ci="${ci}">
+        <span class="ch-icon">${ch.icon}</span><span>${ch.text}</span>
+      </button>`;
+    });
+    html+=`</div>`;
+    html+=`<div class="scene-feedback" id="sfb-${idx}"></div>`;
+    html+=`<button class="scene-next-btn" id="snext-${idx}">Siguiente →</button>`;
+  }
+
+  card.innerHTML=html;
+  container.innerHTML='';
+  container.appendChild(card);
+
+  // BIND events
+  if(scene.type==='evidence'){
+    card.querySelectorAll('.ev-item').forEach(el=>{
+      el.addEventListener('click',()=>{
+        const id=el.dataset.id;
+        if(INVESTIGATION.foundEvidence.has(id))return;
+        INVESTIGATION.foundEvidence.add(id);
+        const cause=el.dataset.cause;
+        if(cause)INVESTIGATION.foundCauses.add(cause);
+        const pts=parseInt(el.dataset.pts)||10;
+        INVESTIGATION.phase2Points+=pts;
+        el.classList.add('collected');
+        SFX.evidence();
+        showToast(`🔍 Evidencia recolectada +${pts} pts`,'info');
+        updateInvStats();
+        // show next btn when all collected
+        if(INVESTIGATION.foundEvidence.size>=scene.items.length){
+          const hint=document.getElementById(`ev-hint-${idx}`);
+          if(hint){hint.className='scene-feedback ok';hint.textContent='✅ ¡Todas las evidencias recolectadas! Puedes continuar.';}
+          const nb=document.getElementById(`ev-next-${idx}`);
+          if(nb)nb.classList.add('visible');
+        }
+      });
+    });
+    const nb=document.getElementById(`ev-next-${idx}`);
+    if(nb)nb.addEventListener('click',()=>{currentSceneIdx++;renderScene(currentSceneIdx);window.scrollTo({top:0,behavior:'smooth'});});
+  }
+
+  if(scene.type==='choice'){
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const ci=parseInt(btn.dataset.ci);
+        const ch=scene.choices[ci];
+        card.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+        const fb=document.getElementById(`sfb-${idx}`);
+        const nb=document.getElementById(`snext-${idx}`);
+
+        if(ch.correct){
+          btn.classList.add('ch-correct');
+          fb.className='scene-feedback ok'; fb.textContent=ch.feedback;
+          INVESTIGATION.phase2Points+=scene.points.correct;
+          if(ch.cause)ch.cause.forEach(c=>INVESTIGATION.foundCauses.add(c));
+          SFX.correct();
+          showToast(`✅ +${scene.points.correct} pts`);
+        }else{
+          btn.classList.add('ch-wrong');
+          fb.className='scene-feedback bad'; fb.textContent=ch.feedback;
+          SFX.wrong();
+          showToast('❌ Decisión incorrecta','error');
+          // show correct
+          card.querySelectorAll('.choice-btn').forEach((b,bi)=>{
+            if(scene.choices[bi].correct)b.classList.add('ch-correct');
+          });
+        }
+        updateInvStats();
+        if(nb)nb.classList.add('visible');
+        nb.addEventListener('click',()=>{currentSceneIdx++;renderScene(currentSceneIdx);window.scrollTo({top:0,behavior:'smooth'});},{once:true});
+      });
+    });
+  }
+
+  // Build cause tree if past scene 2
+  if(idx>=2 && INVESTIGATION.foundCauses.size>0){
+    const treeDiv=document.createElement('div');
+    treeDiv.className='cause-tree';
+    treeDiv.innerHTML=`<h4>🌲 Árbol de causas construido</h4>`+buildCauseTreeHTML();
+    card.appendChild(treeDiv);
+  }
+}
+
+function buildCauseTreeHTML(){
+  const causes={
+    cause1:{label:'Sin sistema anticaídas (acto inseguro)',type:'basic'},
+    cause2:{label:'Andamio sin barandas (condición insegura)',type:'basic'},
+    cause3:{label:'Permiso de trabajo no firmado',type:'direct'},
+    cause4:{label:'Falta de supervisión SST / Presión cronograma',type:'root'}
+  };
+  return Object.entries(causes).map(([id,c])=>{
+    const found=INVESTIGATION.foundCauses.has(id);
+    if(!found)return'';
+    return`<div class="cause-row">
+      <div class="c-dot ${c.type}"></div>
+      <span style="color:${c.type==='root'?'#42a5f5':c.type==='direct'?'#ffa726':'#ef5350'}">${c.label}</span>
+    </div>`;
+  }).join('');
+}
+
+/* FINAL REPORT */
+function showFinalReport(){
+  SFX.win();
+  const container=document.getElementById('inv-scene-container');
+  const totalPoints=points+INVESTIGATION.phase2Points;
+  const causesFound=INVESTIGATION.foundCauses.size;
+  const evFound=INVESTIGATION.foundEvidence.size;
+
+  let rank,rankClass;
+  if(totalPoints>=160){rank='🏅 EXPERTO SST';rankClass='rank-expert';}
+  else if(totalPoints>=120){rank='🎖️ AVANZADO';rankClass='rank-advanced';}
+  else if(totalPoints>=80){rank='📋 BÁSICO';rankClass='rank-basic';}
+  else{rank='👷 EN FORMACIÓN';rankClass='rank-rookie';}
+
+  const allCauses=[
+    {id:'cause1',label:'Sin sistema anticaídas'},
+    {id:'cause2',label:'Andamio sin barandas'},
+    {id:'cause3',label:'Permiso de trabajo no firmado'},
+    {id:'cause4',label:'Falta de supervisión SST'}
+  ];
+
+  const causesHTML=allCauses.map(c=>{
+    const found=INVESTIGATION.foundCauses.has(c.id);
+    return`<div class="report-line">
+      <div class="dot ${found?'dot-found':'dot-missed'}"></div>
+      <span style="color:${found?'#a5d6a7':'#ef9a9a'}">${c.label} ${found?'✓ Identificada':'✗ No identificada'}</span>
+    </div>`;
+  }).join('');
+
+  container.innerHTML=`
+    <div class="final-report">
+      <h2>📄 INFORME FINAL</h2>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:4px">Caso: Accidente de Trabajo — Juan García</p>
+      <div class="report-score">${totalPoints} pts</div>
+      <div class="report-rank ${rankClass}">${rank}</div>
+
+      <div class="report-causes">
+        <h4>🌲 Causas del accidente</h4>
+        ${causesHTML}
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px">
+        <div class="inv-stat">🔍 Evidencias <span class="sv">${evFound}/6</span></div>
+        <div class="inv-stat">📋 Causas <span class="sv">${causesFound}/4</span></div>
+        <div class="inv-stat">⭐ Fase 1 <span class="sv">${points}</span></div>
+        <div class="inv-stat">🔎 Fase 2 <span class="sv">${INVESTIGATION.phase2Points}</span></div>
+      </div>
+
+      <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6;margin-bottom:18px">
+        La investigación de accidentes de trabajo no busca culpables, sino <strong style="color:var(--gold)">causas sistémicas</strong> para prevenirlos. Cada hallazgo es una oportunidad de mejora.
+      </p>
+
+      <button class="restart-btn" onclick="restartGame()">🔄 Jugar de nuevo</button>
+    </div>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 </script>
 </body>
 </html>
